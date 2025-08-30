@@ -7,6 +7,7 @@ import hashlib
 import os
 import time
 import logging
+import uuid
 from datetime import datetime
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
@@ -57,10 +58,20 @@ def s3_client(test_config):
 @pytest.fixture(scope="session")
 def test_bucket(s3_client, test_config):
     """테스트용 버킷 생성/삭제 픽스처"""
-    bucket_name = f"{test_config.test_bucket_prefix}{int(time.time())}"
+    import uuid
+    # UUID를 추가해서 고유한 버킷 이름 생성
+    bucket_name = f"{test_config.test_bucket_prefix}{int(time.time())}-{uuid.uuid4().hex[:8]}"
     
-    s3_client.create_bucket(Bucket=bucket_name)
-    logger.info(f"테스트 버킷 생성: {bucket_name}")
+    try:
+        s3_client.create_bucket(Bucket=bucket_name)
+        logger.info(f"테스트 버킷 생성: {bucket_name}")
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'BucketAlreadyExists':
+            # 기존 버킷이 있다면 삭제 후 재생성
+            bucket_name = f"{test_config.test_bucket_prefix}{int(time.time())}-{uuid.uuid4().hex[:8]}"
+            s3_client.create_bucket(Bucket=bucket_name)
+        else:
+            raise
     
     yield bucket_name
     
