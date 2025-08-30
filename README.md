@@ -22,3 +22,17 @@ NCP Object Storage의 S3 호환 API에 대한 포괄적인 자동화 테스트 �
 ```bash
 pip install -r requirements.txt
 pytest test_ncp_storage.py -v --html=reports/report.html
+
+## 프로젝트 성과 지표
+- 테스트 케이스: 6개
+- 성공률: 83% (5/6)
+- 발견된 호환성 이슈: 2건
+- 자동화된 검증 항목: 기본 CRUD, 데이터 무결성, 에러 처리
+
+## 저장소 구조
+ncp-object-storage-automation/
+├── test_ncp_storage.py     # 메인 테스트 코드
+├── issues-found.md         # 발견된 이슈 문서
+├── portfolio-summary.md    # 프로젝트 요약
+├── reports/               # 테스트 결과 리포트
+└── README.md             # 프로젝트 개요
