@@ -7,4 +7,3 @@ requests==2.32.5
 python-dotenv==1.1.1
 PyYAML==6.0.1
 coloredlogs==15.0.1
-pytest-xvs==3.0.0
