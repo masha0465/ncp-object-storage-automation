@@ -1,0 +1,9 @@
+pytest==8.4.1
+pytest-html==4.1.1
+pytest-xdist==3.8.0
+boto3==1.28.57
+botocore==1.31.57
+requests==2.32.5
+python-dotenv==1.1.1
+PyYAML==6.0.1
+coloredlogs==15.0.1

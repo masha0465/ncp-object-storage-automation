@@ -1,0 +1,58 @@
+# NCP Object Storage 테스트 설정
+ncp:
+  endpoint_url: "https://kr.object.ncloudstorage.com"
+  region: "kr-standard"
+  test_bucket_prefix: "pytest-test-"
+
+# 성능 테스트 설정
+performance:
+  file_sizes_mb: [1, 5, 10]  # 테스트할 파일 크기 (MB)
+  timeout_seconds: 300       # 테스트 타임아웃
+  concurrent_uploads: 10     # 동시 업로드 수
+  max_workers: 5            # 최대 워커 수
+  upload_time_limit_per_mb: 3  # MB당 최대 업로드 시간(초)
+
+# 데이터 무결성 테스트 설정
+integrity:
+  file_sizes_bytes: [1024, 1048576, 5242880]  # 1KB, 1MB, 5MB
+
+# 에러 처리 테스트 설정
+error_handling:
+  invalid_access_key: "INVALID_KEY"
+  invalid_secret_key: "invalid_secret"
+  nonexistent_bucket: "nonexistent-bucket-12345"
+
+# 로깅 설정
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "ncp_test.log"
+  console: true
+
+# 테스트 리포트 설정
+report:
+  html_file: "reports/test_report.html"
+  log_file: "reports/test.log"
+  screenshots_dir: "reports/screenshots"
+
+# pytest 설정
+pytest:
+  markers:
+    - "slow: 느린 테스트 마킹"
+    - "integration: 통합 테스트 마킹"
+    - "performance: 성능 테스트 마킹"
+    - "security: 보안 테스트 마킹"
+
+# 테스트 환경별 설정
+environments:
+  development:
+    log_level: "DEBUG"
+    performance_file_sizes_mb: [1, 2]  # 개발 시 작은 파일 크기
+  
+  staging:
+    log_level: "INFO"
+    performance_file_sizes_mb: [1, 5, 10]
+    
+  production:
+    log_level: "WARNING" 
+    performance_file_sizes_mb: [10, 50, 100]  # 대용량 테스트

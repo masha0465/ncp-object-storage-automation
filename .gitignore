@@ -1,0 +1,17 @@
+# Environment variables
+.env
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+
+# Test artifacts
+reports/
+*.html
+
+# IDE
+.vscode/
+.idea/
