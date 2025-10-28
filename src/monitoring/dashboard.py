@@ -189,6 +189,14 @@ def create_dashboard():
                 title='업로드 속도 추이 (MB/s)',
                 labels={'throughput_mbps': '속도 (MB/s)', 'index': '요청 번호'}
             )
+            fig_upload.update_traces(
+                line_color='#FF6B6B',  # 선명한 빨강
+                line_width=3
+            )
+            fig_upload.update_layout(
+                plot_bgcolor='white',
+                paper_bgcolor='white'
+            )
             st.plotly_chart(fig_upload, use_container_width=True)
             
             col1, col2 = st.columns(2)
@@ -199,7 +207,12 @@ def create_dashboard():
                     uploads_df,
                     x='file_size_mb',
                     nbins=20,
-                    title='파일 크기 분포'
+                    title='파일 크기 분포',
+                    color_discrete_sequence=['#4A90E2']  # 진한 파란색
+                )
+                fig_size.update_layout(
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
                 )
                 st.plotly_chart(fig_size, use_container_width=True)
             
@@ -209,7 +222,13 @@ def create_dashboard():
                 fig_success = px.pie(
                     values=success_counts.values,
                     names=['성공' if k else '실패' for k in success_counts.index],
-                    title='업로드 성공/실패'
+                    title='업로드 성공/실패',
+                    color_discrete_sequence=['#51CF66', '#FF6B6B']  # 초록, 빨강
+                )
+                fig_success.update_traces(
+                    textposition='inside',
+                    textinfo='percent+label',
+                    marker=dict(line=dict(color='white', width=2))
                 )
                 st.plotly_chart(fig_success, use_container_width=True)
     
@@ -226,8 +245,21 @@ def create_dashboard():
                 title='파일 크기 감소율 추이 (%)',
                 labels={'reduction_percent': '감소율 (%)', 'index': '처리 번호'}
             )
-            fig_reduction.add_hline(y=60, line_dash="dash", line_color="red", 
-                                   annotation_text="목표: 60%")
+            fig_reduction.update_traces(
+                line_color='#845EC2',  # 보라색
+                line_width=3
+            )
+            fig_reduction.add_hline(
+                y=60, 
+                line_dash="dash", 
+                line_color="#FF6B6B",  # 빨강 점선
+                line_width=2,
+                annotation_text="목표: 60%"
+            )
+            fig_reduction.update_layout(
+                plot_bgcolor='white',
+                paper_bgcolor='white'
+            )
             st.plotly_chart(fig_reduction, use_container_width=True)
             
             col1, col2 = st.columns(2)
@@ -238,10 +270,24 @@ def create_dashboard():
                 total_optimized = opt_df['optimized_size_mb'].sum()
                 
                 fig_comparison = go.Figure(data=[
-                    go.Bar(name='최적화 전', x=['Total'], y=[total_original]),
-                    go.Bar(name='최적화 후', x=['Total'], y=[total_optimized])
+                    go.Bar(
+                        name='최적화 전', 
+                        x=['Total'], 
+                        y=[total_original],
+                        marker_color='#FF8787'  # 연한 빨강
+                    ),
+                    go.Bar(
+                        name='최적화 후', 
+                        x=['Total'], 
+                        y=[total_optimized],
+                        marker_color='#51CF66'  # 초록
+                    )
                 ])
-                fig_comparison.update_layout(title='전체 저장 용량 비교 (MB)')
+                fig_comparison.update_layout(
+                    title='전체 저장 용량 비교 (MB)',
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
+                )
                 st.plotly_chart(fig_comparison, use_container_width=True)
                 
                 st.success(f"💾 총 {total_original - total_optimized:.2f}MB 절감!")

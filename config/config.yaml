@@ -1,20 +1,36 @@
-# NCP Object Storage 테스트 설정
+# NCP Object Storage 테스트 설정 (Phase 1)
 ncp:
   endpoint_url: "https://kr.object.ncloudstorage.com"
   region: "kr-standard"
   test_bucket_prefix: "pytest-test-"
 
+  # Phase 2 추가 설정
+  object_storage:
+    endpoint: "https://kr.object.ncloudstorage.com"
+    region: "kr-standard"
+    bucket_name: "test-automation-bucket"
+
+  cdn:
+    service_id: "${CDN_SERVICE_ID}"
+    api_endpoint: "https://ncloud.apigw.ntruss.com/cdn/v2"
+    purge_timeout: 300
+
+  image_optimizer:
+    endpoint: "https://imageoptimizer.apigw.ntruss.com/v1"
+    max_file_size_mb: 10
+    supported_formats: ["jpg", "jpeg", "png", "webp", "gif"]
+
 # 성능 테스트 설정
 performance:
-  file_sizes_mb: [1, 5, 10]  # 테스트할 파일 크기 (MB)
-  timeout_seconds: 300       # 테스트 타임아웃
-  concurrent_uploads: 10     # 동시 업로드 수
-  max_workers: 5            # 최대 워커 수
-  upload_time_limit_per_mb: 3  # MB당 최대 업로드 시간(초)
+  file_sizes_mb: [1, 5, 10]
+  timeout_seconds: 300
+  concurrent_uploads: 10
+  max_workers: 5
+  upload_time_limit_per_mb: 3
 
 # 데이터 무결성 테스트 설정
 integrity:
-  file_sizes_bytes: [1024, 1048576, 5242880]  # 1KB, 1MB, 5MB
+  file_sizes_bytes: [1024, 1048576, 5242880]
 
 # 에러 처리 테스트 설정
 error_handling:
@@ -43,16 +59,89 @@ pytest:
     - "performance: 성능 테스트 마킹"
     - "security: 보안 테스트 마킹"
 
+# Phase 2: Pipeline Configuration
+pipeline:
+  scenarios:
+    static_website:
+      description: "정적 웹사이트 배포 시나리오"
+      steps:
+        - upload_to_storage
+        - optimize_images
+        - deploy_to_cdn
+
+    media_library:
+      description: "미디어 라이브러리 관리 시나리오"
+      steps:
+        - upload_original
+        - generate_thumbnails
+        - optimize_all_sizes
+        - sync_to_cdn
+
+# Phase 2: Image Optimization Settings
+optimization:
+  quality:
+    high: 85
+    medium: 75
+    low: 60
+
+  formats:
+    webp:
+      quality: 80
+      method: 4
+    jpeg:
+      quality: 85
+      optimize: true
+      progressive: true
+
+  thumbnails:
+    sizes:
+      - { name: "large", width: 1920, height: 1080 }
+      - { name: "medium", width: 1280, height: 720 }
+      - { name: "small", width: 640, height: 360 }
+      - { name: "thumb", width: 320, height: 180 }
+
+# Phase 2: Monitoring & Metrics
+monitoring:
+  metrics:
+    - api_response_time
+    - file_size_reduction
+    - cdn_cache_hit_rate
+    - upload_success_rate
+    - cost_per_gb
+
+  thresholds:
+    max_response_time_ms: 500
+    min_success_rate: 99.0
+    min_cache_hit_rate: 80.0
+    max_file_size_increase: 0
+
+# Phase 2: Testing Configuration
+testing:
+  sample_files:
+    image: "tests/fixtures/sample.jpg"
+    large_image: "tests/fixtures/large.jpg"
+    video_thumbnail: "tests/fixtures/video_thumb.png"
+
+  performance:
+    max_upload_time_sec: 10
+    max_optimization_time_sec: 5
+    concurrent_uploads: 5
+
+  retry:
+    max_attempts: 3
+    backoff_factor: 2
+    timeout_sec: 30
+
 # 테스트 환경별 설정
 environments:
   development:
     log_level: "DEBUG"
-    performance_file_sizes_mb: [1, 2]  # 개발 시 작은 파일 크기
-  
+    performance_file_sizes_mb: [1, 2]
+
   staging:
     log_level: "INFO"
     performance_file_sizes_mb: [1, 5, 10]
-    
+
   production:
-    log_level: "WARNING" 
-    performance_file_sizes_mb: [10, 50, 100]  # 대용량 테스트
+    log_level: "WARNING"
+    performance_file_sizes_mb: [10, 50, 100]
