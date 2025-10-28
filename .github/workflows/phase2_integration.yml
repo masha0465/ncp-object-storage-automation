@@ -61,14 +61,7 @@ jobs:
     - name: 테스트 픽스처 생성
       run: |
         mkdir -p tests/fixtures
-        python -c "
-from PIL import Image
-# 샘플 이미지 생성
-Image.new('RGB', (1920, 1080), color='blue').save('tests/fixtures/sample.jpg', quality=95)
-Image.new('RGB', (4000, 3000), color='red').save('tests/fixtures/large.jpg', quality=95)
-Image.new('RGB', (800, 600), color='green').save('tests/fixtures/video_thumb.png')
-print('✓ 테스트 픽스처 생성 완료')
-        "
+        python -c "from PIL import Image; Image.new('RGB', (1920, 1080), color='blue').save('tests/fixtures/sample.jpg', quality=95); Image.new('RGB', (4000, 3000), color='red').save('tests/fixtures/large.jpg', quality=95); Image.new('RGB', (800, 600), color='green').save('tests/fixtures/video_thumb.png'); print('✓ 테스트 픽스처 생성 완료')"
     
     - name: 통합 테스트 실행 (E2E 시나리오)
       env:
@@ -105,54 +98,14 @@ print('✓ 테스트 픽스처 생성 완료')
     
     - name: 이미지 최적화 성능 테스트
       run: |
-        python -c "
-import time
-from PIL import Image
-from pathlib import Path
-from src.optimizer.image_processor import ImageProcessor
-
-processor = ImageProcessor()
-test_dir = Path('perf_test')
-test_dir.mkdir(exist_ok=True)
-
-# 다양한 크기의 이미지 생성 및 최적화
-sizes = [(640, 480), (1920, 1080), (3840, 2160)]
-results = []
-
-for width, height in sizes:
-    img_path = test_dir / f'test_{width}x{height}.jpg'
-    Image.new('RGB', (width, height), color='blue').save(img_path, quality=95)
-    
-    start = time.time()
-    result = processor.optimize_image(str(img_path), target_format='webp', quality=80)
-    duration = time.time() - start
-    
-    results.append({
-        'size': f'{width}x{height}',
-        'duration': duration,
-        'reduction': result.reduction_percent
-    })
-    print(f'{width}x{height}: {duration:.3f}s, {result.reduction_percent:.1f}% 감소')
-
-# 성능 기준 검증
-assert all(r['duration'] < 5.0 for r in results), '최적화는 5초 이내여야 함'
-assert all(r['reduction'] > 30 for r in results), '최소 30% 이상 압축 필요'
-print('✓ 성능 벤치마크 통과')
-        "
+        python tests/performance/benchmark_optimizer.py
     
     - name: 업로드 속도 벤치마크
       run: |
-        python -c "
-import time
-from pathlib import Path
-from src.storage.client import NCPStorageClient
-
-# Mock 테스트 (실제 업로드는 secrets 있을 때만)
-print('업로드 속도 벤치마크 (시뮬레이션)')
-print('- 5MB 파일: ~2.5초 예상')
-print('- 10MB 파일: ~5초 예상')
-print('✓ 벤치마크 완료')
-        "
+        echo "업로드 속도 벤치마크 (시뮬레이션)"
+        echo "- 5MB 파일: ~2.5초 예상"
+        echo "- 10MB 파일: ~5초 예상"
+        echo "✓ 벤치마크 완료"
 
   security-check:
     name: 보안 검사
