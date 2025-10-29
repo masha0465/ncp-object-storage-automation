@@ -379,9 +379,8 @@ GitHub Actions를 통한 자동화된 테스트 및 배포:
 ## 👤 작성자
 
 **김선아**
-- Email: masha0465@gmail.com
+- Email: pingpongvv@gmail.com
 - GitHub: [@masha0465](https://github.com/masha0465)
-- 경력: 9년 클라우드 QA (AWS, Azure, K8s)
 
 ---
 
